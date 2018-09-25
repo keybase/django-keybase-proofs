@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block title %}Django Test App{% endblock %}
+
+{% block content %}
+This is a test-only application, try viewing proofs on the
+<a href="{% url 'keybase_proofs:profile' username=user.get_username %}">profile</a> page or submitting a
+<a href="{% url 'keybase_proofs:new-proof' %}?kb_username=kb_user&sig_hash=deadbeef">new proof</a>.
+{% endblock %}

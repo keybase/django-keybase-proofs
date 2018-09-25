@@ -1,0 +1,26 @@
+{% extends "keybase_proofs/_base.html" %}
+
+{% block title %} Confirm your keybase proof {% endblock %}
+
+{% block content %}
+{% if error %}
+Something isn't right: {{ error }}
+{% else %}
+<p>
+  Link <strong>{{ user.get_username }}</strong> with <strong>{{ kb_username }}</strong> via signature <strong>{{ sig_hash }}</strong>?
+</p>
+<form method="post" action="">
+    {% csrf_token %}
+    <input type="hidden" name="kb_username" value="{{ kb_username }}" />
+    <input type="hidden" name="sig_hash" value="{{ sig_hash }}"/>
+    <input type="submit" value="Submit" />
+</form>
+{% endif %}
+{% endblock %}
+
+{% comment %}
+Sample implementation of the user preparing to publish the proof. After
+submitting on keybase a user will be redirected here with the `kb_username` and
+`sig_hash` query parameters filled in. This landing page allows a user to
+verify what they are putting in their profile before submitting.
+{% endcomment %}

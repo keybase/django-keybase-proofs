@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Django Test App</title>
+</head>
+
+<body>
+    <div id="header">
+    {% block header %} <a href="{% url 'index' %}">Home</a> |
+
+    {% if user.is_authenticated %}
+        Logged in: {{ user.get_username }} |
+        <a href="{% url 'keybase_proofs:profile' username=user.get_username %}">profile</a> |
+        <a href="{% url 'keybase_proofs:new-proof' %}?kb_username=kb_user&sig_hash=deadbeef">new proof</a> |
+        <a href="{% url 'auth_logout' %}">Logout</a>
+    {% else %}
+       <a href="{% url 'auth_login' %}">Login</a>
+    {% endif %}
+    {% endblock %}
+    </div>
+
+    <div id="content">
+    <h1>{% block title %}{% endblock %}</h1>
+    {% block content %}
+
+    {% endblock content %}
+    </div>
+
+</body>
+
+</html>

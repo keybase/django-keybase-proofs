@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form method="post" action="">
+    <input type="text" name="username" />
+    <input type="submit" value="Log in" />
+    <input type="hidden" name="next" value="{{ next }}" />
+</form>
+{% endblock %}

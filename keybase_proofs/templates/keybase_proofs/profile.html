@@ -1,0 +1,33 @@
+{% extends "keybase_proofs/_base.html" %}
+
+{% block title %}Keybase proofs{% endblock %}
+
+{% block content %}
+
+{% if not object_list|length %}
+<p>
+  Nothing to see here, try
+  <a href="{% url 'keybase_proofs:new-proof' %}?kb_username=kb_example_user&sig_hash=deadbeef"> posting a proof </a>
+</p>
+{% else %}
+  <table>
+    <tr>
+      <th>Keybase Username</th>
+      <th>Sig Hash</th>
+    </tr>
+    {% for proof in object_list %}
+      <tr>
+        <td>{{ proof.kb_username }}</td>
+        <td>{{ proof.sig_hash }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endif %}
+
+{% endblock %}
+
+
+{% comment %}
+Sample page for displaying existing keybase proofs on a user's profile.
+TODO: add comment about validating posts with keybase servers and implement this.
+{% endcomment %}
