@@ -16,10 +16,12 @@
       <th>Sig Hash</th>
     </tr>
     {% for proof in object_list %}
-      <tr>
-        <td>{{ proof.kb_username }}</td>
-        <td>{{ proof.sig_hash }}</td>
-      </tr>
+      {% if proof.is_verified %}
+        <tr>
+          <td><a href="https://keybase.io/{{ proof.kb_username }}">{{ proof.kb_username }}</a></td>
+          <td>{{ proof.sig_hash }}</td>
+        </tr>
+      {% endif %}
     {% endfor %}
   </table>
 {% endif %}
@@ -28,6 +30,6 @@
 
 
 {% comment %}
-Sample page for displaying existing keybase proofs on a user's profile.
-TODO: add comment about validating posts with keybase servers and implement this.
+Sample page for displaying existing keybase proofs on a user's profile. Only
+verified proofs are shown.
 {% endcomment %}

@@ -16,6 +16,9 @@ class KeybaseProof(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     kb_username = models.CharField(max_length=128)
     sig_hash = models.CharField(max_length=66)
+    # Flag indicating if the profile page should display this proof. Set once
+    # the keybase servers have verified it.
+    is_verified = models.BooleanField(default=False)
 
     class Meta:
         unique_together = (('user', 'kb_username'),)
@@ -30,7 +33,9 @@ class KeybaseProof(models.Model):
         }
 
     def __str__(self):
-        return '<KeybaseProof username:{},kb_username:{},sig_hash:{}'.format(
+        return '<KeybaseProof username:{}, kb_username:{}, sig_hash:{}, is_verified:{}'.format(
             self.user.username,
             self.kb_username,
-            self.sig_hash)
+            self.sig_hash,
+            self.is_verified,
+        )

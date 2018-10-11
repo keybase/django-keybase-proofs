@@ -1,7 +1,9 @@
 import re
 
+import requests
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -12,6 +14,29 @@ from django.views.generic import ListView
 from jsonview.views import JsonView
 
 from keybase_proofs.models import KeybaseProof
+
+
+def verify_proof(user, sig_hash, kb_username):
+    """
+    Check the proof status in keybase and set is_verified if the proof is
+    ok.
+    """
+    endpoint = "https://keybase.io/_/api/1.0/check_proof?sig_hash={}&kb_username={}".format(
+        sig_hash, kb_username)
+    try:
+        r = requests.get(endpoint)
+        if r.json().get('proof_ok', False):
+            try:
+                with transaction.atomic():
+                    kb_proof = KeybaseProof.objects.get(
+                        user=user, sig_hash=sig_hash, kb_username=kb_username)
+                    kb_proof.is_verified = True
+                    kb_proof.save()
+            except KeybaseProof.DoesNotExist:
+                # Lost the race, user has posted a new sig or removed this one.
+                pass
+    except requests.exceptions.RequestException:
+        pass
 
 
 class KeybaseProofProfileView(ListView):
@@ -91,12 +116,14 @@ class KeybaseProofView(View):
         kb_username = request.POST.get('kb_username')
         error = self._validate(sig_hash, kb_username)
         if error is None:
-            # TODO validate that the kb_username is a valid keybase user, and
-            # either reject the save or have a flag to indicate valid users.
-            kb_proof, _ = KeybaseProof.objects.get_or_create(
+            kb_proof, created = KeybaseProof.objects.get_or_create(
                 user=request.user, kb_username=kb_username)
+            # clear any verification if we are updating the signature.
+            if not created:
+                kb_proof.is_verified = False
             kb_proof.sig_hash = sig_hash
             kb_proof.save()
+            verify_proof(request.user, sig_hash, kb_username)
             return redirect(self.get_success_url())
 
         return render(request, self.template_name, {'error': error}, status=400)
