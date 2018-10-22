@@ -2,7 +2,7 @@
 
 [![PyPI version](https://badge.fury.io/py/keybase-proofs.svg?maxAge=2592000)](https://badge.fury.io/py/keybase-proofs)
 [![PyPI](https://img.shields.io/pypi/pyversions/keybase-proofs.svg)](https://pypi.python.org/pypi/keybase-proofs)
-[![Travis CI](https://travis-ci.org/macropin/django-registration.svg?branch=master)](https://travis-ci.org/macropin/django-registration)
+[![Travis CI](https://travis-ci.org/keybase/django-keybase-proofs.svg?branch=master)](https://travis-ci.org/keybase/django-keybase-proofs)
 
 `keybase-proofs` is a Django application and reference implementation for
 integrating Keybase proofs into a web app.. If you are looking to integrate
