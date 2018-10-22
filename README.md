@@ -1,7 +1,7 @@
 # django-keybase-proofs
 
-[![PyPI version](https://badge.fury.io/py/keybase-proofs.svg?maxAge=2592000)](https://badge.fury.io/py/keybase-proofs)
-[![PyPI](https://img.shields.io/pypi/pyversions/keybase-proofs.svg)](https://pypi.python.org/pypi/keybase-proofs)
+[![PyPI version](https://badge.fury.io/py/django-keybase-proofs.svg?maxAge=2592000)](https://badge.fury.io/py/django-keybase-proofs)
+[![PyPI](https://img.shields.io/pypi/pyversions/django-keybase-proofs.svg)](https://pypi.python.org/pypi/django-keybase-proofs)
 [![Travis CI](https://travis-ci.org/keybase/django-keybase-proofs.svg?branch=master)](https://travis-ci.org/keybase/django-keybase-proofs)
 
 `keybase-proofs` is a Django application and reference implementation for
