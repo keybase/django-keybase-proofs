@@ -26,6 +26,7 @@ setup(
     version=get_version().replace(' ', '-'),
     description='Support for keybase proofs in Django',
     long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
     author='Josh Blum',
     author_email='jblum18@gmail.com',
     url='https://github.com/keybase/django-keybase-proofs',

@@ -5,11 +5,13 @@
 [![Travis CI](https://travis-ci.org/macropin/django-registration.svg?branch=master)](https://travis-ci.org/macropin/django-registration)
 
 `keybase-proofs` is a Django application and reference implementation for
-keybase proofs, as described here (TODO add url to public spec doc). If you are
-looking to integrate keybase proofs into your application and you use Django,
-you can use this as a drop-in library. Otherwise, you can [run the server
+integrating Keybase proofs into a web app.. If you are looking to integrate
+Keybase proofs into your application and you use Django, you can use this as a
+drop-in library. Otherwise, you can [run the server
 locally](##exploring-the-example-service) or checkout the code to see how to
-build your own integration.
+build your own integration. You can read the [full integration
+documentation](https://keybase.io/docs/proof_service) for all of the required
+steps to integrate with Keybase.
 
 The library supports Django 1.11 to Django 2.1 across Python versions 2.7 to
 3.7. If you would like to see a feature or find a bug, please let us know by
@@ -37,9 +39,9 @@ Add `url(r'^keybase_proofs/', include('keybase_proofs.urls')),` to your main
 `urls.py`
 
 You can copy the example templates in `keybase_proofs/templates/` to customize
-and style as necessary.
-
-TODO add instructions or link for submitting app to keybase and generating a config.
+and style as necessary. Checkout the [remaining
+steps](https://keybase.io/docs/proof_service#4-steps-to-rollout) to integrate
+and submit your configuration to Keybase.
 
 ## Exploring the example service
 

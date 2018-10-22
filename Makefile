@@ -23,12 +23,13 @@ release: clean lint test
 	ifeq ($(TAG_NAME),)
 	$(error Usage: make release TAG_NAME=<tag-name>)
 	endif
-	# NOTE(joshblum): First you should bump the version in setup.py
+	# NOTE(joshblum): First you should bump the version in
+	# keybase_proofs/__init__.py
 	git clean -dxf
 	git tag $(TAG_NAME)
 	git push --tags
 	# To check whether the README formats properly.
-	python setup.py check -s --restructuredtext
+	python setup.py check --strict
 	# Create the wheels for Python2 and Python3.
 	python setup.py bdist_wheel --universal
 	# Upload to pypi.
