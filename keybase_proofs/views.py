@@ -1,6 +1,8 @@
 import re
 
 import requests
+from jsonview.views import JsonView
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
@@ -11,9 +13,13 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import ListView
-from jsonview.views import JsonView
 
 from keybase_proofs.models import KeybaseProof
+
+
+def fullmatch(regex, string, flags=0):
+    """Emulate python-3.4 re.fullmatch()."""
+    return re.match("(?:" + regex + r")\Z", string, flags=flags)
 
 
 def verify_proof(user, sig_hash, kb_username):
@@ -21,10 +27,13 @@ def verify_proof(user, sig_hash, kb_username):
     Check the proof status in keybase and set is_verified if the proof is
     ok.
     """
-    endpoint = "https://keybase.io/_/api/1.0/check_proof?sig_hash={}&kb_username={}".format(
+    endpoint = "https://keybase.io/_/api/1.0/sig/check_proof.json?sig_hash={}&kb_username={}".format(
         sig_hash, kb_username)
     try:
         r = requests.get(endpoint)
+        if r.status_code != 200:
+            print("Invalid response:", r)
+            return
         if r.json().get('proof_ok', False):
             try:
                 with transaction.atomic():
@@ -35,7 +44,7 @@ def verify_proof(user, sig_hash, kb_username):
             except KeybaseProof.DoesNotExist:
                 # Lost the race, user has posted a new sig or removed this one.
                 pass
-    except requests.exceptions.RequestException:
+    except Exception:
         pass
 
 
@@ -86,7 +95,7 @@ class KeybaseProofView(View):
     template_name = 'keybase_proofs/profile_confirm.html'
 
     def _is_hex(self, s):
-        return re.fullmatch(r'^[0-9a-fA-F]+$', s or "") is not None
+        return fullmatch(r'^[0-9a-fA-F]+$', s or "") is not None
 
     def get_success_url(self):
         return reverse('keybase_proofs:profile', kwargs={

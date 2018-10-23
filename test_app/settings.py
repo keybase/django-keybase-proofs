@@ -1,11 +1,19 @@
 # The most basic of settings to get the app to run as an example, should *never* be used in a
 # production environment.
-DATABASES = {
-    'default': {
+import os
+
+import dj_database_url
+
+DATABASES = {}
+db_url = os.environ.get('DATABASE_URL', '')
+if db_url:
+    DATABASES['default'] = dj_database_url.parse(db_url, conn_max_age=600, ssl_require=True)
+else:
+    DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': 'dr.sqlite3',
-    },
-}
+    }
+
 
 INSTALLED_APPS = (
     'django.contrib.auth',

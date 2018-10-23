@@ -1,0 +1,24 @@
+{
+  "name": "Django Keybase Proofs",
+  "description": "Reference implementation for keybase proofs.",
+  "repository": "https://github.com/keybase/django-keybase-proofs",
+  "keywords": ["keybase", "django", "proofs"],
+  "logo": "https://keybase.io/images/icons/icon-keybase-logo-48.png",
+  "website": "https://keybase.io",
+  "success_url": "/",
+  "scripts": {
+    "postdeploy": "./manage.py migrate"
+  },
+  "buildpacks": [{
+    "url": "heroku/python"
+  }],
+  "addons": [{
+    "plan": "heroku-postgresql"
+  }],
+  "env": {
+    "DISABLE_COLLECTSTATIC": {
+      "description": "No static files in the test application",
+      "value": "1"
+    }
+  }
+}

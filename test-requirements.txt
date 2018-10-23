@@ -3,3 +3,7 @@ isort
 tox-travis
 ipython
 docutils
+mock
+django-jsonview
+requests
+dj-database-url

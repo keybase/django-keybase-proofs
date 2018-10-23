@@ -1,11 +1,16 @@
 from operator import itemgetter
-from unittest.mock import MagicMock
-from unittest.mock import patch
 
 from django.test import TestCase
 from django.urls import reverse
 
 from keybase_proofs.users import UserModel
+
+try:
+    from unittest.mock import MagicMock
+    from unittest.mock import patch
+except ImportError:
+    from mock import MagicMock
+    from mock import patch
 
 
 class TestViews(TestCase):
@@ -61,8 +66,8 @@ class TestViews(TestCase):
         }
         resp = self.client.post(reverse('keybase_proofs:new-proof'), data=valid_data, follow=True)
         self.assertEqual(resp.status_code, 200)
-        endpoint = "https://keybase.io/_/api/1.0/check_proof?sig_hash={sig_hash}&kb_username={kb_username}"
-        mock_requests.assert_called_once_with(endpoint.format(**valid_data))
+        kb_endpoint = "https://keybase.io/_/api/1.0/sig/check_proof.json?sig_hash={sig_hash}&kb_username={kb_username}"
+        mock_requests.assert_called_once_with(kb_endpoint.format(**valid_data))
         mock_requests.reset_mock()
 
         resp = self.client.get(list_proofs_url)
@@ -73,7 +78,7 @@ class TestViews(TestCase):
         valid_data['sig_hash'] = valid_data['sig_hash'] + '123'
         resp = self.client.post(reverse('keybase_proofs:new-proof'), data=valid_data, follow=True)
         self.assertEqual(resp.status_code, 200)
-        mock_requests.assert_called_once_with(endpoint.format(**valid_data))
+        mock_requests.assert_called_once_with(kb_endpoint.format(**valid_data))
         mock_requests.reset_mock()
 
         resp = self.client.get(list_proofs_url)
@@ -87,7 +92,7 @@ class TestViews(TestCase):
         }
         resp = self.client.post(reverse('keybase_proofs:new-proof'), data=valid_data2, follow=True)
         self.assertEqual(resp.status_code, 200)
-        mock_requests.assert_called_once_with(endpoint.format(**valid_data2))
+        mock_requests.assert_called_once_with(kb_endpoint.format(**valid_data2))
         mock_requests.reset_mock()
 
         resp = self.client.get(list_proofs_url)

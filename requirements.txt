@@ -2,5 +2,6 @@
 twine
 pytest>3.2.1
 Django>1.11
-django-jsonview
-requests
+dj-database-url
+psycopg2
+gunicorn

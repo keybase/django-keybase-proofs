@@ -3,6 +3,7 @@
 [![PyPI version](https://badge.fury.io/py/django-keybase-proofs.svg?maxAge=2592000)](https://badge.fury.io/py/django-keybase-proofs)
 [![PyPI](https://img.shields.io/pypi/pyversions/django-keybase-proofs.svg)](https://pypi.python.org/pypi/django-keybase-proofs)
 [![Travis CI](https://travis-ci.org/keybase/django-keybase-proofs.svg?branch=master)](https://travis-ci.org/keybase/django-keybase-proofs)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 `keybase-proofs` is a Django application and reference implementation for
 integrating Keybase proofs into a web app.. If you are looking to integrate
@@ -63,6 +64,12 @@ When running the test server you can play around with posting proofs/reading
 the API. The test server does not have any authentication mechanism. Any
 username you submit on the login form will be authenticated and can post a
 proof.
+
+## Verifying the integration
+
+While integrating you can use the [verification
+script](https://keybase.io/docs/proof_service/verification_script) to help
+manually verify the correctness your integration.
 
 ## Development tips
 
