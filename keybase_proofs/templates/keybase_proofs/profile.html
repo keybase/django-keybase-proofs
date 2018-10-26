@@ -18,7 +18,7 @@
     {% for proof in object_list %}
       {% if proof.is_verified %}
         <tr>
-          <td><a href="https://keybase.io/{{ proof.kb_username }}">{{ proof.kb_username }}</a></td>
+          <td><a href="https://keybase.io/{{ proof.kb_username }}/sigs/{{ proof.sig_hash }}">{{ proof.kb_username }}</a></td>
           <td>{{ proof.sig_hash }}</td>
         </tr>
       {% endif %}

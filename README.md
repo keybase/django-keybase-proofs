@@ -11,8 +11,8 @@ Keybase proofs into your application and you use Django, you can use this as a
 drop-in library. Otherwise, you can [run the server
 locally](##exploring-the-example-service) or checkout the code to see how to
 build your own integration. You can read the [full integration
-documentation](https://keybase.io/docs/proof_service) for all of the required
-steps to integrate with Keybase.
+documentation](https://keybase.io/docs/proof_integration_guide) for all of the
+required steps to integrate with Keybase.
 
 The library supports Django 1.11 to Django 2.1 across Python versions 2.7 to
 3.7. If you would like to see a feature or find a bug, please let us know by
@@ -41,8 +41,8 @@ Add `url(r'^keybase_proofs/', include('keybase_proofs.urls')),` to your main
 
 You can copy the example templates in `keybase_proofs/templates/` to customize
 and style as necessary. Checkout the [remaining
-steps](https://keybase.io/docs/proof_service#4-steps-to-rollout) to integrate
-and submit your configuration to Keybase.
+steps](https://keybase.io/docs/proof_integration_guide#4-steps-to-rollout) to
+integrate and submit your configuration to Keybase.
 
 ## Exploring the example service
 
@@ -65,11 +65,40 @@ the API. The test server does not have any authentication mechanism. Any
 username you submit on the login form will be authenticated and can post a
 proof.
 
+
+## Example config
+
+Here is an example configuration if you were to use this library. You should
+check out [the
+documentation](https://keybase.io/docs/proof_integration_guide#1-config) for
+the complete description of what's going on here.
+
+```json
+{
+  "version": 1,
+  "domain": "<your-domain.com>",
+  "display_name": "Django Keybase Proofs",
+  "username": {
+    "re": "^[a-zA-Z0-9_]{2,20}$",
+    "min": 2,
+    "max": 20
+  },
+  "brand_color": "#000100",
+  "logo": null,
+  "description": "Next gen social network using big data & AI in the cloud 🤖☁️.",
+  "prefill_url": "https://<your-domain.com>/new-proof?kb_username=%{kb_username}&sig_hash=%{sig_hash}",
+  "profile_url": "https://<your-domain.com>/profile/%{username}",
+  "check_url": "https://<your-domain.com>/api/%{username}",
+  "check_path": ["keybase_proofs"],
+  "contact": ["admin@<your-domain.com>", "joshblum@keybase"]
+}
+```
+
 ## Verifying the integration
 
 While integrating you can use the [verification
-script](https://keybase.io/docs/proof_service/verification_script) to help
-manually verify the correctness your integration.
+script](https://keybase.io/docs/proof_integration_guide/verification_script) to
+help manually verify the correctness your integration.
 
 ## Development tips
 
