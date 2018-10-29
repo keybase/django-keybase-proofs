@@ -89,7 +89,7 @@ the complete description of what's going on here.
   "prefill_url": "https://<your-domain.com>/new-proof?kb_username=%{kb_username}&sig_hash=%{sig_hash}",
   "profile_url": "https://<your-domain.com>/profile/%{username}",
   "check_url": "https://<your-domain.com>/api/%{username}",
-  "check_path": ["keybase_proofs"],
+  "check_path": ["keybase_sigs"],
   "contact": ["admin@<your-domain.com>", "joshblum@keybase"]
 }
 ```

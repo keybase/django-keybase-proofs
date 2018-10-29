@@ -75,7 +75,7 @@ class KeybaseProofListView(JsonView, KeybaseProofProfileView):
         # an empty queryset for a valid username.
         queryset = self.get_queryset()
         return {
-            'keybase_proofs': [x.to_dict() for x in queryset]
+            'keybase_sigs': [x.to_dict() for x in queryset]
         }
 
 

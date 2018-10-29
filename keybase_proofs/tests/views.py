@@ -30,7 +30,7 @@ class TestViews(TestCase):
         UserModel().objects.create_user(username, 'bob@bob.com', password)
         resp = self.client.get(list_proofs_url)
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.json(), {'keybase_proofs': []})
+        self.assertEqual(resp.json(), {'keybase_sigs': []})
 
         self.client.login(username=username, password=password)
 
@@ -72,7 +72,7 @@ class TestViews(TestCase):
 
         resp = self.client.get(list_proofs_url)
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.json(), {'keybase_proofs': [valid_data]})
+        self.assertEqual(resp.json(), {'keybase_sigs': [valid_data]})
 
         # update sig_hash
         valid_data['sig_hash'] = valid_data['sig_hash'] + '123'
@@ -83,7 +83,7 @@ class TestViews(TestCase):
 
         resp = self.client.get(list_proofs_url)
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.json(), {'keybase_proofs': [valid_data]})
+        self.assertEqual(resp.json(), {'keybase_sigs': [valid_data]})
 
         # add second proof
         valid_data2 = {
@@ -97,7 +97,7 @@ class TestViews(TestCase):
 
         resp = self.client.get(list_proofs_url)
         self.assertEqual(resp.status_code, 200)
-        resp_proofs = resp.json().get('keybase_proofs', [])
+        resp_proofs = resp.json().get('keybase_sigs', [])
         self.assertEqual(sorted(resp_proofs, key=itemgetter('kb_username')), sorted([valid_data, valid_data2], key=itemgetter('kb_username')))
 
         # simple get on profile page
