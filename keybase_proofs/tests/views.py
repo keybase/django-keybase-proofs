@@ -1,5 +1,6 @@
 from operator import itemgetter
 
+from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
 
@@ -17,7 +18,8 @@ class TestViews(TestCase):
 
     @patch('requests.get')
     def test_views(self, mock_requests):
-        mock_requests.return_value = MagicMock(json=lambda: {'proof_ok': True})
+        mock_requests.return_value = MagicMock(status_code=200,
+                                               json=lambda: {'valid_proof': True, 'proof_live': False})
 
         # non-existent user gives a 404
         username = 'bob'
@@ -66,8 +68,13 @@ class TestViews(TestCase):
         }
         resp = self.client.post(reverse('keybase_proofs:new-proof'), data=valid_data, follow=True)
         self.assertEqual(resp.status_code, 200)
-        kb_endpoint = "https://keybase.io/_/api/1.0/sig/check_proof.json?sig_hash={sig_hash}&kb_username={kb_username}"
-        mock_requests.assert_called_once_with(kb_endpoint.format(**valid_data))
+        kb_endpoint = "https://keybase.io/_/api/1.0/sig/check_proof.json"
+        mock_requests.assert_called_once_with(kb_endpoint, params={
+            'domain': settings.KEYBASE_PROOFS_DOMAIN,
+            'kb_username': valid_data['kb_username'],
+            'username': username,
+            'sig_hash': valid_data['sig_hash']
+        })
         mock_requests.reset_mock()
 
         resp = self.client.get(list_proofs_url)
@@ -78,7 +85,12 @@ class TestViews(TestCase):
         valid_data['sig_hash'] = valid_data['sig_hash'] + '123'
         resp = self.client.post(reverse('keybase_proofs:new-proof'), data=valid_data, follow=True)
         self.assertEqual(resp.status_code, 200)
-        mock_requests.assert_called_once_with(kb_endpoint.format(**valid_data))
+        mock_requests.assert_called_once_with(kb_endpoint, params={
+            'domain': settings.KEYBASE_PROOFS_DOMAIN,
+            'kb_username': valid_data['kb_username'],
+            'username': username,
+            'sig_hash': valid_data['sig_hash']
+        })
         mock_requests.reset_mock()
 
         resp = self.client.get(list_proofs_url)
@@ -92,7 +104,12 @@ class TestViews(TestCase):
         }
         resp = self.client.post(reverse('keybase_proofs:new-proof'), data=valid_data2, follow=True)
         self.assertEqual(resp.status_code, 200)
-        mock_requests.assert_called_once_with(kb_endpoint.format(**valid_data2))
+        mock_requests.assert_called_once_with(kb_endpoint, params={
+            'domain': settings.KEYBASE_PROOFS_DOMAIN,
+            'kb_username': valid_data2['kb_username'],
+            'username': username,
+            'sig_hash': valid_data2['sig_hash']
+        })
         mock_requests.reset_mock()
 
         resp = self.client.get(list_proofs_url)

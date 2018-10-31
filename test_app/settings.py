@@ -64,3 +64,5 @@ MIDDLEWARE = (
 )
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Must match the `domain` set in the config.
+KEYBASE_PROOFS_DOMAIN = '<your-domain.com>'

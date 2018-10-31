@@ -8,5 +8,5 @@ app_name = 'keybase_proofs'
 urlpatterns = [
     url(r'^api/(?P<username>.+)?', KeybaseProofListView.as_view(), name='list-proofs-api'),
     url(r'^profile/(?P<username>.+)?', KeybaseProofProfileView.as_view(), name='profile'),
-    url(r'^new-proof?', KeybaseProofView.as_view(), name='new-proof'),
+    url(r'^new-proof/?', KeybaseProofView.as_view(), name='new-proof'),
 ]

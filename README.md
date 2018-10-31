@@ -6,7 +6,7 @@
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
 `keybase-proofs` is a Django application and reference implementation for
-integrating Keybase proofs into a web app.. If you are looking to integrate
+integrating Keybase proofs into a web app. If you are looking to integrate
 Keybase proofs into your application and you use Django, you can use this as a
 drop-in library. Otherwise, you can [run the server
 locally](##exploring-the-example-service) or checkout the code to see how to
@@ -27,13 +27,16 @@ To install:
 pip install keybase-proofs
 ```
 
-Add `keybase_proofs` to settings.py's `INSTALLED_APPS`:
+Add `keybase_proofs` to settings.py's `INSTALLED_APPS` and set the
+`KEYBASE_PROOFS_DOMAIN` settings:
 
 ```python
 INSTALLED_APPS = (
     # ...other installed applications...
     'keybase_proofs',
 )
+# Must match the `domain` set in the config.
+KEYBASE_PROOFS_DOMAIN = <your-domain.com>
 ```
 
 Add `url(r'^keybase_proofs/', include('keybase_proofs.urls')),` to your main
@@ -43,6 +46,15 @@ You can copy the example templates in `keybase_proofs/templates/` to customize
 and style as necessary. Checkout the [remaining
 steps](https://keybase.io/docs/proof_integration_guide#4-steps-to-rollout) to
 integrate and submit your configuration to Keybase.
+
+NOTE: In the integration guide [periodic
+checking](https://keybase.io/docs/proof_integration_guide#3-linking-user-profiles)
+of the proof's liveness is discussed. This library does not implement the this
+behavior since there is not an generic way to express this for Django
+applications. We provide a library function
+(`keybase_proofs.views.verify_proof`) to implement this functionality if
+desired. The job scheduling/retry behavior is left up to the implementation.
+
 
 ## Exploring the example service
 
@@ -86,9 +98,9 @@ the complete description of what's going on here.
   "brand_color": "#000100",
   "logo": null,
   "description": "Next gen social network using big data & AI in the cloud 🤖☁️.",
-  "prefill_url": "https://<your-domain.com>/new-proof?kb_username=%{kb_username}&sig_hash=%{sig_hash}",
-  "profile_url": "https://<your-domain.com>/profile/%{username}",
-  "check_url": "https://<your-domain.com>/api/%{username}",
+  "prefill_url": "https://<your-domain.com>/keybase-proofs/new-proof?kb_username=%{kb_username}&sig_hash=%{sig_hash}",
+  "profile_url": "https://<your-domain.com>/keybase-proofs/profile/%{username}",
+  "check_url": "https://<your-domain.com>/keybase-proofs/api/%{username}",
   "check_path": ["keybase_sigs"],
   "contact": ["admin@<your-domain.com>", "joshblum@keybase"]
 }
