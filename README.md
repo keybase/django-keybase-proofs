@@ -5,8 +5,8 @@
 [![Travis CI](https://travis-ci.org/keybase/django-keybase-proofs.svg?branch=master)](https://travis-ci.org/keybase/django-keybase-proofs)
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
-`keybase-proofs` is a Django application and reference implementation for
-integrating Keybase proofs into a web app. If you are looking to integrate
+`django-keybase-proofs` is a Django application and reference implementation
+for integrating Keybase proofs into a web app. If you are looking to integrate
 Keybase proofs into your application and you use Django, you can use this as a
 drop-in library. Otherwise, you can [run the server
 locally](##exploring-the-example-service) or checkout the code to see how to
@@ -24,7 +24,7 @@ request](https://github.com/keybase/keybase-proofs/pulls).
 To install:
 
 ```
-pip install keybase-proofs
+pip install django-keybase-proofs
 ```
 
 Add `keybase_proofs` to settings.py's `INSTALLED_APPS` and set the
