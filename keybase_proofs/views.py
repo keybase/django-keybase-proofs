@@ -10,7 +10,6 @@ from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
-from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import ListView
@@ -114,10 +113,8 @@ class KeybaseProofView(View):
     def _is_hex(self, s):
         return fullmatch(r'^[0-9a-fA-F]+$', s or "") is not None
 
-    def get_success_url(self):
-        return reverse('keybase_proofs:profile', kwargs={
-            'username': self.request.user.username,
-        })
+    def get_redirect_url(self, **kwargs):
+        return "https://keybase.io/_/proof_creation_success?kb_ua={kb_ua}&kb_username={kb_username}&sig_hash={sig_hash}&username={username}&domain={domain}".format(**kwargs)
 
     def _validate(self, sig_hash, kb_username):
         error = None
@@ -130,16 +127,19 @@ class KeybaseProofView(View):
     def get(self, request, *args, **kwargs):
         sig_hash = request.GET.get('sig_hash')
         kb_username = request.GET.get('kb_username')
+        kb_ua = request.GET.get('kb_ua')
         error = self._validate(sig_hash, kb_username)
         return render(request, self.template_name, {
             'sig_hash': sig_hash,
             'kb_username': kb_username,
+            'kb_ua': kb_ua,
             'error': error
         })
 
     def post(self, request, *args, **kwargs):
         sig_hash = request.POST.get('sig_hash')
         kb_username = request.POST.get('kb_username')
+        kb_ua = request.POST.get('kb_ua')
         error = self._validate(sig_hash, kb_username)
         if error is None:
             valid_proof, _ = verify_proof(request.user, sig_hash, kb_username)
@@ -151,6 +151,12 @@ class KeybaseProofView(View):
                 kb_proof.is_verified = valid_proof
                 kb_proof.sig_hash = sig_hash
                 kb_proof.save()
-                return redirect(self.get_success_url())
+                return redirect(self.get_redirect_url(**{
+                    'kb_ua': kb_ua,
+                    'kb_username': kb_username,
+                    'sig_hash': sig_hash,
+                    'username': request.user.username,
+                    'domain': get_domain(),
+                }), permanent=True)
 
         return render(request, self.template_name, {'error': error}, status=400)

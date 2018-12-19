@@ -1,3 +1,4 @@
+from copy import copy
 from operator import itemgetter
 
 from django.conf import settings
@@ -9,9 +10,11 @@ from keybase_proofs.users import UserModel
 try:
     from unittest.mock import MagicMock
     from unittest.mock import patch
+    from urllib.parse import quote_plus
 except ImportError:
     from mock import MagicMock
     from mock import patch
+    from urllib import quote_plus
 
 
 class TestViews(TestCase):
@@ -41,6 +44,8 @@ class TestViews(TestCase):
         self.assertEqual(resp.status_code, 400)
         mock_requests.assert_not_called()
 
+        kb_ua = quote_plus('darwin:Keybase CLI (go1.10.3):2.11.0')
+        domain = quote_plus(settings.KEYBASE_PROOFS_DOMAIN)
         resp = self.client.post(reverse('keybase_proofs:new-proof'), data={
             'kb_username': 'kb_{}'.format(username),
         })
@@ -65,9 +70,14 @@ class TestViews(TestCase):
         valid_data = {
             'kb_username': 'kb_{}'.format(username),
             'sig_hash': 'abc123',
+            'kb_ua': kb_ua,
         }
-        resp = self.client.post(reverse('keybase_proofs:new-proof'), data=valid_data, follow=True)
-        self.assertEqual(resp.status_code, 200)
+        resp = self.client.post(reverse('keybase_proofs:new-proof'), data=valid_data)
+        self.assertEqual(resp.status_code, 301)
+        kb_redirect_endpoint_tpl = "https://keybase.io/_/proof_creation_success?kb_ua={kb_ua}&kb_username={kb_username}&sig_hash={sig_hash}&username={username}&domain={domain}"
+        self.assertEqual(resp.url, kb_redirect_endpoint_tpl.format(
+            domain=domain, username=username, **valid_data))
+
         kb_endpoint = "https://keybase.io/_/api/1.0/sig/check_proof.json"
         mock_requests.assert_called_once_with(kb_endpoint, params={
             'domain': settings.KEYBASE_PROOFS_DOMAIN,
@@ -79,12 +89,17 @@ class TestViews(TestCase):
 
         resp = self.client.get(list_proofs_url)
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.json(), {'keybase_sigs': [valid_data]})
+        expected_response = copy(valid_data)
+        del expected_response['kb_ua']
+        self.assertEqual(resp.json(), {'keybase_sigs': [expected_response]})
 
         # update sig_hash
         valid_data['sig_hash'] = valid_data['sig_hash'] + '123'
-        resp = self.client.post(reverse('keybase_proofs:new-proof'), data=valid_data, follow=True)
-        self.assertEqual(resp.status_code, 200)
+        resp = self.client.post(reverse('keybase_proofs:new-proof'), data=valid_data)
+        self.assertEqual(resp.status_code, 301)
+        self.assertEqual(resp.url, kb_redirect_endpoint_tpl.format(
+            domain=domain, username=username, **valid_data))
+
         mock_requests.assert_called_once_with(kb_endpoint, params={
             'domain': settings.KEYBASE_PROOFS_DOMAIN,
             'kb_username': valid_data['kb_username'],
@@ -95,15 +110,21 @@ class TestViews(TestCase):
 
         resp = self.client.get(list_proofs_url)
         self.assertEqual(resp.status_code, 200)
-        self.assertEqual(resp.json(), {'keybase_sigs': [valid_data]})
+        expected_response = copy(valid_data)
+        del expected_response['kb_ua']
+        self.assertEqual(resp.json(), {'keybase_sigs': [expected_response]})
 
         # add second proof
         valid_data2 = {
             'kb_username': 'kb2_{}'.format(username),
             'sig_hash': 'abc123',
+            'kb_ua': kb_ua,
         }
-        resp = self.client.post(reverse('keybase_proofs:new-proof'), data=valid_data2, follow=True)
-        self.assertEqual(resp.status_code, 200)
+        resp = self.client.post(reverse('keybase_proofs:new-proof'), data=valid_data2)
+        self.assertEqual(resp.status_code, 301)
+        self.assertEqual(resp.url, kb_redirect_endpoint_tpl.format(
+            domain=domain, username=username, **valid_data2))
+
         mock_requests.assert_called_once_with(kb_endpoint, params={
             'domain': settings.KEYBASE_PROOFS_DOMAIN,
             'kb_username': valid_data2['kb_username'],
@@ -115,7 +136,10 @@ class TestViews(TestCase):
         resp = self.client.get(list_proofs_url)
         self.assertEqual(resp.status_code, 200)
         resp_proofs = resp.json().get('keybase_sigs', [])
-        self.assertEqual(sorted(resp_proofs, key=itemgetter('kb_username')), sorted([valid_data, valid_data2], key=itemgetter('kb_username')))
+        expected_response2 = copy(valid_data2)
+        del expected_response2['kb_ua']
+        self.assertEqual(sorted(resp_proofs, key=itemgetter('kb_username')),
+                         sorted([expected_response, expected_response2], key=itemgetter('kb_username')))
 
         # simple get on profile page
         resp = self.client.get(reverse('keybase_proofs:profile', kwargs={'username': username}))
