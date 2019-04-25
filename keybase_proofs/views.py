@@ -42,7 +42,7 @@ def verify_proof(user, sig_hash, kb_username):
     """
 
     domain = get_domain()
-    endpoint = "https://keybase.io/_/api/1.0/sig/check_proof.json"
+    endpoint = "https://keybase.io/_/api/1.0/sig/proof_valid.json"
     try:
         r = requests.get(endpoint, params={
             'domain': domain,
@@ -52,11 +52,11 @@ def verify_proof(user, sig_hash, kb_username):
         })
         if r.status_code != 200:
             print("Invalid response:", r)
-            return False, False
+            return False
         r_json = r.json()
-        return r_json.get('valid_proof', False), r_json.get('proof_live', False)
+        return r_json.get('proof_valid', False)
     except Exception:
-        return False, False
+        return False
 
 
 class KeybaseProofProfileView(ListView):
@@ -142,7 +142,7 @@ class KeybaseProofView(View):
         kb_ua = request.POST.get('kb_ua')
         error = self._validate(sig_hash, kb_username)
         if error is None:
-            valid_proof, _ = verify_proof(request.user, sig_hash, kb_username)
+            valid_proof = verify_proof(request.user, sig_hash, kb_username)
             if not valid_proof:
                 error = "Invalid signature, please retry"
             else:

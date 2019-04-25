@@ -22,7 +22,7 @@ class TestViews(TestCase):
     @patch('requests.get')
     def test_views(self, mock_requests):
         mock_requests.return_value = MagicMock(status_code=200,
-                                               json=lambda: {'valid_proof': True, 'proof_live': False})
+                                               json=lambda: {'proof_valid': True})
 
         # non-existent user gives a 404
         username = 'bob'
@@ -78,7 +78,7 @@ class TestViews(TestCase):
         self.assertEqual(resp.url, kb_redirect_endpoint_tpl.format(
             domain=domain, username=username, **valid_data))
 
-        kb_endpoint = "https://keybase.io/_/api/1.0/sig/check_proof.json"
+        kb_endpoint = "https://keybase.io/_/api/1.0/sig/proof_valid.json"
         mock_requests.assert_called_once_with(kb_endpoint, params={
             'domain': settings.KEYBASE_PROOFS_DOMAIN,
             'kb_username': valid_data['kb_username'],
