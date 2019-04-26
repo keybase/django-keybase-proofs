@@ -14,7 +14,7 @@ build your own integration. You can read the [full integration
 documentation](https://keybase.io/docs/proof_integration_guide) for all of the
 required steps to integrate with Keybase.
 
-The library supports Django 1.11 to Django 2.1 across Python versions 2.7 to
+The library supports Django 1.11 to Django 2.2 across Python versions 2.7 to
 3.7. If you would like to see a feature or find a bug, please let us know by
 opening an [issue](https://github.com/keybase/keybase-proofs/issues) or [pull
 request](https://github.com/keybase/keybase-proofs/pulls).
