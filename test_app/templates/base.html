@@ -12,7 +12,7 @@
     {% if user.is_authenticated %}
         Logged in: {{ user.get_username }} |
         <a href="{% url 'keybase_proofs:profile' username=user.get_username %}">profile</a> |
-        <a href="{% url 'keybase_proofs:new-proof' %}?kb_username=t_alice&sig_hash=8514ae2f9083a3c867318437845855f702a4154d1671a19cf274fb2e6b7dec7c0f"> new proof </a> |
+        <a href="{% url 'keybase_proofs:new-proof' %}?kb_username=t_alice&username=t_alice&sig_hash=8514ae2f9083a3c867318437845855f702a4154d1671a19cf274fb2e6b7dec7c0f"> new proof </a> |
         <a href="{% url 'auth_logout' %}">Logout</a>
     {% else %}
        <a href="{% url 'auth_login' %}">Login</a>

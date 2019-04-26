@@ -33,6 +33,12 @@ setup(
     package_dir={'keybase_proofs': 'keybase_proofs'},
     packages=find_packages(exclude='test_app'),
     tests_require=['pytest-django'],
+    install_requires=[
+        'dj-database-url<=0.5.0',
+        'py2casefold<=1.0.1',
+        'requests<=2.19.1',
+        'django-jsonview<=1.2.0',
+    ],
     cmdclass={'test': PyTest},
     include_package_data=True,
     classifiers=[

@@ -12,6 +12,7 @@ Something isn't right: {{ error }}
 <form method="post" action="">
     {% csrf_token %}
     <input type="hidden" name="kb_username" value="{{ kb_username }}" />
+    <input type="hidden" name="username" value="{{ user.get_username }}" />
     <input type="hidden" name="sig_hash" value="{{ sig_hash }}"/>
     <input type="hidden" name="kb_ua" value="{{ kb_ua }}"/>
     <input type="submit" value="Submit" />

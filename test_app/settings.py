@@ -21,6 +21,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.contenttypes',
     'django.contrib.admin',
+    'django.contrib.messages',
     'keybase_proofs',
     'test_app',
 )

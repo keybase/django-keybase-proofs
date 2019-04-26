@@ -2,6 +2,7 @@ import re
 
 import requests
 from jsonview.views import JsonView
+from py2casefold import casefold
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -29,16 +30,13 @@ def get_domain():
     return domain
 
 
-def verify_proof(user, sig_hash, kb_username):
+def is_proof_valid(username, sig_hash, kb_username):
     """
-    Check the proof status in Keybase via the `sig/check_proof` endpoint.
-    Returns a tuple (valid_proof, proof_live) indicating if the signature is
-    valid for the given domain/kb_username/username combination and if the
-    proof is publicly verifiable to the Keybase client/server respectively.
+    Check the proof validity in Keybase via the `sig/proof_valid` endpoint.
+    Returns a boolean `proof_valid` indicating if the signature is valid for
+    the given domain/kb_username/username/sig_hash combination.
 
-    Before storing a signature `valid_proof=True` must hold. Services can
-    optionally check the status of signatures periodically and verify
-    `proof_live=True` as well.
+    Before storing a signature `proof_valid=True` must hold.
     """
 
     domain = get_domain()
@@ -46,7 +44,7 @@ def verify_proof(user, sig_hash, kb_username):
     try:
         r = requests.get(endpoint, params={
             'domain': domain,
-            'username': user.username,
+            'username': username,
             'kb_username': kb_username,
             'sig_hash': sig_hash,
         })
@@ -57,6 +55,40 @@ def verify_proof(user, sig_hash, kb_username):
         return r_json.get('proof_valid', False)
     except Exception:
         return False
+
+
+def is_proof_live(user, sig_hash, kb_username):
+    """
+    Checks the proof status in Keybase via the `sig/proof_live` endpoint.
+    Returns a tuple (`proof_valid`, `proof_live`) indicating if the signature
+    is live and if the proof is publicly verifiable to the Keybase
+    client/server, respectively.
+
+    Keybase suggests an asynchronous task that calls this endpoint during the
+    proof creation flow. It will return (proof_valid=True, proof_live=False)
+    until Keybase has seen it being served from this service's API, at which
+    point it will update to (proof_valid=True, proof_live=True). This is the
+    happy path.  It may also make sense to call this endpoint periodically or
+    whenever a user inspects their own proof/profile/settings to update local
+    records.  If a user revokes their proof from Keybase, this will return
+    (profo_valid=False, proof_live=False).
+    """
+    domain = get_domain()
+    endpoint = "https://keybase.io/_/api/1.0/sig/proof_live.json"
+    try:
+        r = requests.get(endpoint, params={
+            'domain': domain,
+            'username': user.username,
+            'kb_username': kb_username,
+            'sig_hash': sig_hash,
+        })
+        if r.status_code != 200:
+            print("Invalid response:", r)
+            return False, False
+        r_json = r.json()
+        return r_json.get('proof_valid', False), r_json.get('proof_live', False)
+    except Exception:
+        return False, False
 
 
 class KeybaseProofProfileView(ListView):
@@ -116,10 +148,19 @@ class KeybaseProofView(View):
     def get_redirect_url(self, **kwargs):
         return "https://keybase.io/_/proof_creation_success?kb_ua={kb_ua}&kb_username={kb_username}&sig_hash={sig_hash}&username={username}&domain={domain}".format(**kwargs)
 
-    def _validate(self, sig_hash, kb_username):
+    def username_eq(self, u1, u2):
+        """
+        Force each username to lowercase and compare them. Can be overridden if
+        the service has case sensitive usernames.
+        """
+        return casefold(u1) == casefold(u2)
+
+    def _validate(self, user, username, sig_hash, kb_username):
         error = None
-        if not (sig_hash and kb_username):
-            error = 'both sig_hash and kb_username query parameters are required'
+        if not all([username, sig_hash, kb_username]):
+            error = 'username, sig_hash, and kb_username query parameters are required'
+        elif not self.username_eq(user.username, username):
+            error = 'please logout from {} and login as {}'.format(user.username, username)
         elif not self._is_hex(sig_hash):
             error = 'sig_hash must be a hex string'
         return error
@@ -128,7 +169,8 @@ class KeybaseProofView(View):
         sig_hash = request.GET.get('sig_hash')
         kb_username = request.GET.get('kb_username')
         kb_ua = request.GET.get('kb_ua')
-        error = self._validate(sig_hash, kb_username)
+        username = request.GET.get('username')
+        error = self._validate(request.user, username, sig_hash, kb_username)
         return render(request, self.template_name, {
             'sig_hash': sig_hash,
             'kb_username': kb_username,
@@ -139,16 +181,17 @@ class KeybaseProofView(View):
     def post(self, request, *args, **kwargs):
         sig_hash = request.POST.get('sig_hash')
         kb_username = request.POST.get('kb_username')
+        username = request.POST.get('username')
         kb_ua = request.POST.get('kb_ua')
-        error = self._validate(sig_hash, kb_username)
+        error = self._validate(request.user, username, sig_hash, kb_username)
         if error is None:
-            valid_proof = verify_proof(request.user, sig_hash, kb_username)
-            if not valid_proof:
+            proof_valid = is_proof_valid(username, sig_hash, kb_username)
+            if not proof_valid:
                 error = "Invalid signature, please retry"
             else:
                 kb_proof, created = KeybaseProof.objects.get_or_create(
                     user=request.user, kb_username=kb_username)
-                kb_proof.is_verified = valid_proof
+                kb_proof.is_verified = proof_valid
                 kb_proof.sig_hash = sig_hash
                 kb_proof.save()
                 return redirect(self.get_redirect_url(**{

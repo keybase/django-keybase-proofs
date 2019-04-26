@@ -98,7 +98,7 @@ the complete description of what's going on here.
   "brand_color": "#000100",
   "logo": null,
   "description": "Next gen social network using big data & AI in the cloud 🤖☁️.",
-  "prefill_url": "https://<your-domain.com>/keybase-proofs/new-proof?kb_username=%{kb_username}&sig_hash=%{sig_hash}&kb_ua=%{kb_ua}",
+  "prefill_url": "https://<your-domain.com>/keybase-proofs/new-proof?kb_username=%{kb_username}&username=%{username}&sig_hash=%{sig_hash}&kb_ua=%{kb_ua}",
   "profile_url": "https://<your-domain.com>/keybase-proofs/profile/%{username}",
   "check_url": "https://<your-domain.com>/keybase-proofs/api/%{username}",
   "check_path": ["keybase_sigs"],
