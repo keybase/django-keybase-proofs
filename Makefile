@@ -31,7 +31,9 @@ release: clean lint test
 	# To check whether the README formats properly.
 	python setup.py check --strict
 	# Create the wheels for Python2 and Python3.
-	python setup.py bdist_wheel --universal
+	python setup.py sdist bdist_wheel --universal
+	# To check whether the README formats properly.
+	twine check dist/*
 	# Upload to pypi.
 	twine upload dist/*
 
